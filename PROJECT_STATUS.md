@@ -49,6 +49,9 @@ now select a dedicated data directory, loopback daemon endpoint and WebView
 profile. Four configuration tests pass. The Tauri integration has not compiled
 or run yet; keep it separate from the unchanged baseline build until that gate
 finishes. Native tests will use an externally managed named daemon.
+Dynamic windows now share the isolated main-window WebView profile, and service
+installation/removal is unavailable in test mode. Configuration tests pass;
+the Tauri integration check is running in its own target directory.
 
 File System Intelligence is a flagship priority identified by James (Codex,
 September 18). The product boundary now names persistent file and folder

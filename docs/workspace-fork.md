@@ -94,3 +94,10 @@ flags unchanged upstream CRLF files.
 Tauri integration compilation, external-daemon startup, dynamic secondary-window
 profiles, actual data isolation and native screen capture remain unverified.
 These settings are development test infrastructure, not portable release support.
+
+Follow-up: all dynamic window builders now select the same isolated WebView
+directory as the main window, preserving the app's shared browser state while
+separating it from the normal installation. Test launches reject daemon service
+installation and removal before those commands reach the OS. The configuration
+tests still pass. A separate `cargo check --locked -p spacedrive --target-dir
+target-isolation` is running; `isolation-tauri-check.log` holds its output.

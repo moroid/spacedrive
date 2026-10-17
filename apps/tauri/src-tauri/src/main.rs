@@ -987,6 +987,7 @@ async fn install_daemon_service(
 	daemon_state: tauri::State<'_, Arc<RwLock<DaemonState>>>,
 	app_state: tauri::State<'_, AppState>,
 ) -> Result<(), String> {
+	ensure_normal_daemon_service()?;
 	let (data_dir, socket_addr) = {
 		let state = daemon_state.read().await;
 		(state.data_dir.clone(), state.socket_addr.clone())
@@ -1381,6 +1382,7 @@ WantedBy=default.target
 /// Uninstall daemon service
 #[tauri::command]
 async fn uninstall_daemon_service() -> Result<(), String> {
+	ensure_normal_daemon_service()?;
 	#[cfg(target_os = "macos")]
 	{
 		let home =
@@ -1526,6 +1528,16 @@ async fn is_daemon_running(socket_addr: &str) -> bool {
 			false
 		}
 	}
+}
+
+fn ensure_normal_daemon_service() -> Result<(), String> {
+	if sd_tauri_core::workspace_test::workspace_test_launch()
+		.map_err(|error| error.to_string())?
+		.is_some()
+	{
+		return Err("Daemon service changes are unavailable in workspace tests".to_string());
+	}
+	Ok(())
 }
 
 /// Find the daemon binary shipped beside this executable.
@@ -1901,7 +1913,7 @@ fn main() {
 	if let Some(test) = &workspace_test {
 		context.config_mut().identifier = "com.workspacefiler.spacedrive-test".to_string();
 		for window in &mut context.config_mut().app.windows {
-			window.data_directory = Some(test.data_dir.join("webview").join(&window.label));
+			window.data_directory = Some(test.webview_data_dir());
 		}
 	}
 	// Initialize logging

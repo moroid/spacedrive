@@ -9,6 +9,10 @@ pub struct WorkspaceTestLaunch {
 }
 
 impl WorkspaceTestLaunch {
+	pub fn webview_data_dir(&self) -> PathBuf {
+		self.data_dir.join("webview")
+	}
+
 	pub fn from_values(
 		data_dir: Option<OsString>,
 		daemon_addr: Option<OsString>,
@@ -102,6 +106,7 @@ mod tests {
 		.unwrap()
 		.unwrap();
 		assert_eq!(result.data_dir, path);
+		assert_eq!(result.webview_data_dir(), path.join("webview"));
 		assert_eq!(result.daemon_addr.to_string(), "127.0.0.1:7070");
 	}
 }

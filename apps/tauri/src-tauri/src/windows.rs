@@ -1,6 +1,20 @@
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
+fn window_builder<'a>(
+	app: &'a AppHandle,
+	label: impl Into<String>,
+	url: WebviewUrl,
+) -> Result<WebviewWindowBuilder<'a, tauri::Wry, AppHandle>, String> {
+	let builder = WebviewWindowBuilder::new(app, label, url);
+	let test = sd_tauri_core::workspace_test::workspace_test_launch()
+		.map_err(|error| error.to_string())?;
+	Ok(match test {
+		Some(test) => builder.data_directory(test.webview_data_dir()),
+		None => builder,
+	})
+}
+
 /// Window types in Spacedrive
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
@@ -259,20 +273,17 @@ impl SpacedriveWindow {
 
 			Self::FloatingControls => {
 				// Small floating control panel like Cap's recording controls
-				let window = WebviewWindowBuilder::new(
-					app,
-					label,
-					WebviewUrl::App("/floating-controls".into()),
-				)
-				.title("Controls")
-				.inner_size(200.0, 80.0)
-				.resizable(false)
-				.decorations(false)
-				.transparent(true)
-				.always_on_top(true)
-				.skip_taskbar(true)
-				.build()
-				.map_err(|e| format!("Failed to create window: {}", e))?;
+				let window =
+					window_builder(app, label, WebviewUrl::App("/floating-controls".into()))?
+						.title("Controls")
+						.inner_size(200.0, 80.0)
+						.resizable(false)
+						.decorations(false)
+						.transparent(true)
+						.always_on_top(true)
+						.skip_taskbar(true)
+						.build()
+						.map_err(|e| format!("Failed to create window: {}", e))?;
 
 				// Position at bottom center of screen
 				#[cfg(target_os = "macos")]
@@ -321,7 +332,7 @@ impl SpacedriveWindow {
 
 			Self::DragOverlay { session_id } => {
 				let url = format!("/drag-overlay?session={}", session_id);
-				let window = WebviewWindowBuilder::new(app, label, WebviewUrl::App(url.into()))
+				let window = window_builder(app, label, WebviewUrl::App(url.into()))?
 					.title("")
 					.inner_size(200.0, 150.0)
 					.resizable(false)
@@ -340,7 +351,7 @@ impl SpacedriveWindow {
 
 			Self::ContextMenu { context_id } => {
 				let url = format!("/contextmenu?context={}", context_id);
-				let window = WebviewWindowBuilder::new(app, label, WebviewUrl::App(url.into()))
+				let window = window_builder(app, label, WebviewUrl::App(url.into()))?
 					.title("Context Menu Debug")
 					.inner_size(250.0, 300.0) // Initial size, will be adjusted by content
 					.resizable(false)
@@ -375,7 +386,7 @@ fn create_window(
 	always_on_top: bool,
 	transparent: bool,
 ) -> Result<WebviewWindow, String> {
-	let mut builder = WebviewWindowBuilder::new(app, label, WebviewUrl::App(url.into()))
+	let mut builder = window_builder(app, label, WebviewUrl::App(url.into()))?
 		.title(title)
 		.inner_size(size.0, size.1)
 		.min_inner_size(min_size.0, min_size.1)
