@@ -2,8 +2,10 @@
 
 This fork adds the Windows MDI and task workspace described in the source
 project's `docs/08_Spacedriveフォーク移行計画案.md`. The first gate is an unchanged
-Windows build, followed by two independent panes. The application has not
-passed those gates yet.
+Windows build, followed by two independent panes. The unchanged Windows desktop
+build failed at its optional-DLL configuration; the corrected native baseline
+now registers and displays a real test file. The next gate is two independent
+panes. MDI migration and the complete application acceptance remain pending.
 
 ## Provenance
 
@@ -199,3 +201,45 @@ runtime verification of this correction are pending.
 The `workspace-dev` Cargo profile disables LTO and dependency optimization for
 native development iteration. It leaves release unchanged. Its first daemon
 build is in progress; passing this profile will not prove a release artifact.
+
+## Real-folder listing investigation
+
+The first workspace-dev daemon build passed in 5m55s. A new launcher run under
+`.workspace-test/4bdde34fbe494189adacb47eba10444f` confirmed that SourceManager now
+uses the selected instance's adapters directory and that networking reports
+false. In the native UI, Add Storage registered only test folder A, created its
+catalog under that instance, and indexed alpha.txt. Opening the folder then
+showed a blank listing.
+
+Reading the same folder through the daemon's Wire API isolated the divergence:
+the canonical device slug returned one file, while `local` and the current
+device UUID returned zero. DirectoryListingQuery compared raw slug strings and
+classified the two supported local aliases as remote. The query now calls the
+existing SdPath::is_local predicate. The new isolated engine integration test
+reproduced the failure before the fix (`alias local`: 0 rather than 1); its
+post-fix run is in progress. It also checks that another device cannot read the
+local directory. The native test windows and daemon were closed after diagnosis.
+
+The same native flow exposed a Windows naming issue: a backslash path became
+the entire suggested storage name. suggestedName now recognizes drive and UNC
+paths while preserving literal backslashes in POSIX names. Its 23 related tests,
+frontend typecheck, production build and native desktop build passed. Native
+rechecking of the changed suggestion and corrected listing remains pending.
+
+The isolated engine regression failed before the change and passed after it
+(1 test, 1.45s). It verifies equal file IDs for all three current-device names
+and an empty result for an unrelated device. The native recheck under ignored
+`.workspace-test/b14cc0d86308463095a781c0d54c5fee` then confirmed that the suggested
+name was A, registering A produced its catalog inside the selected instance,
+and opening it rendered alpha.txt with its size. The launcher exited normally
+after closing the window and stopped its own daemon.
+
+- Rechecked daemon (workspace-dev) SHA256:
+  `294A15A44C9635C0AC76F7C85185C2E5CC1B71C0B32CD6A63C2801537E8E5180`.
+- Rechecked desktop (debug) SHA256:
+  `8606150A0581AA3D36B6668CB6C34C3C5FC37C5DA4D0D5C5BC7703C5CF9865BA`.
+
+This establishes the corrected native baseline and its design reference for
+Phase 1. It does not validate two panes, migrate workspace data or create a
+portable release of the fork. The earlier release artifact predates the latest
+adapter and listing corrections; distribution validation remains a later gate.

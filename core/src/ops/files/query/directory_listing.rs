@@ -180,7 +180,7 @@ impl DirectoryListingQuery {
 		// by the peer-mount plane. Indexing happens on the owner, so there is
 		// no dispatch fall-through: what the replica holds is the answer.
 		if let SdPath::Physical { device_slug, path } = &self.input.path {
-			if *device_slug != crate::device::get_current_device_slug() {
+			if !self.input.path.is_local() {
 				if let Some(output) = self
 					.list_remote_replica(&context, library_id, device_slug, path)
 					.await

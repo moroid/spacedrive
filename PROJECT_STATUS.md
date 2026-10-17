@@ -36,30 +36,24 @@ Physical-drive identity remains separate from product recognition and visuals.
 
 ## Immediate register
 
-Workspace fork (2026-10-17): work on workspace-mdi starts from upstream
-4d41a379. Unchanged frontend checks pass, including pinned Bun 1.3.4. The
-unchanged daemon release build passed in 20m19s; the unchanged Tauri release
-build failed at the optional codec DLL resource glob. Its fix and the isolated
-launch configuration are integrated. Four configuration tests and complete
-Tauri check pass; the native debug executable builds and displays its startup
-screen. Explicit main-window construction now puts the WebView profile in the
-test directory; the ordinary data directory remains absent. No live listing
-or MDI implementation has been verified.
+Workspace fork (2026-10-17): workspace-mdi starts from upstream 4d41a379.
+Pinned Bun frontend checks pass. The unchanged daemon release build passed;
+the unchanged Tauri build failed at its optional-DLL glob. Compatibility and
+isolated-launch corrections now build and run. The native UI registered only
+test folder A, indexed it and rendered alpha.txt. Its suggested name is now A
+on Windows, rather than the whole path. All test processes were closed.
 
-The lazy default-path daemon fix built successfully. The named-instance smoke
-test revealed automatic drive speed tests and discovery, so its process was
-stopped. Dedicated test settings disable volume monitoring and networking;
-bootstrap now respects networking_enabled. That daemon rebuild is running.
-The test desktop windows are closed. docs/workspace-fork.md records evidence
-and remaining gates. Continue with the corrected daemon/desktop connection.
-The native test launcher now pre-seeds isolated service settings before startup
-and records process ownership and hashes. Parser and PrepareOnly checks pass;
-full execution awaits the daemon rebuild.
-The corrected daemon release build passed in 12m26s. The launcher connected and
-rendered native Home, then cleaned up both child processes. Logs confirm no peer
-endpoint or automatic speed tests. Library adapter initialization still used the
-default data directory; it now uses CoreContext.data_dir. Its first workspace-dev
-build is running. Live listing, isolation recheck and two panes remain pending.
+The selected instance now owns adapters, stores and the main WebView profile.
+Native logs confirm disabled peer discovery and automatic drive speed tests.
+Directory listing now honors local and current-device UUID aliases through
+SdPath::is_local. Its isolated real-engine regression failed before the fix and
+passes after it, preserving another device's separation. The naming suite has
+23 passing tests. docs/workspace-fork.md records exact runs and binary hashes.
+
+Next: Phase 1, two independent live MDI panes while retaining Spacedrive's UI.
+No MDI implementation, workspace migration or fork portable release is complete.
+The newest corrections were exercised in workspace-dev/debug, not a final
+release build. Preserve that distinction during distribution verification.
 
 File System Intelligence is a flagship priority identified by James (Codex,
 September 18). The product boundary now names persistent file and folder
