@@ -9,8 +9,15 @@ import {
 	libraryDefaults,
 	overridesFrom,
 	placementChoices,
+	suggestedName,
 	type AddSettings,
 } from "./addToLibrary";
+
+test("folder names follow Windows drive and UNC separators without changing POSIX names", () => {
+	expect(suggestedName({ kind: "path", path: "C:\\work\\Native QA\\A\\" })).toBe("A");
+	expect(suggestedName({ kind: "path", path: "\\\\server\\share\\folder" })).toBe("folder");
+	expect(suggestedName({ kind: "path", path: "/home/user/a\\b" })).toBe("a\\b");
+});
 
 function volume(overrides: Partial<Volume>): Volume {
 	return {

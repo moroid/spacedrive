@@ -66,7 +66,8 @@ export function targetPath(target: AddTarget): string {
 /** The last component of a path, for a name the user can keep or edit. */
 export function suggestedName(target: AddTarget): string {
 	if (target.kind === "volume") return target.volume.name;
-	const parts = target.path.split("/").filter(Boolean);
+	const windowsPath = /^[a-z]:[\\/]/i.test(target.path) || target.path.startsWith("\\\\");
+	const parts = target.path.split(windowsPath ? /[\\/]/ : "/").filter(Boolean);
 	return parts[parts.length - 1] ?? target.path;
 }
 
