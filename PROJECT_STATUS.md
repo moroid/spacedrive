@@ -36,6 +36,12 @@ Physical-drive identity remains separate from product recognition and visuals.
 
 ## Immediate register
 
+Workspace fork (2026-10-17): Windows MDI and task-workspace development has
+started on `workspace-mdi`, based on upstream `4d41a379`. Unchanged frontend
+typecheck and production build pass. The daemon release build is in progress;
+native startup and two-pane isolation remain pending. `docs/workspace-fork.md`
+records provenance, evidence, and the next gate. No runtime behavior changed.
+
 File System Intelligence is a flagship priority identified by James (Codex,
 September 18). The product boundary now names persistent file and folder
 understanding as a first-class user benefit, with optional cloud acceleration.
