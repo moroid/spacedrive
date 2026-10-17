@@ -41,6 +41,9 @@ started on `workspace-mdi`, based on upstream `4d41a379`. Unchanged frontend
 typecheck and production build pass. The daemon release build is in progress;
 native startup and two-pane isolation remain pending. `docs/workspace-fork.md`
 records provenance, evidence, and the next gate. No runtime behavior changed.
+The frontend checks also pass with pinned Bun 1.3.4. The Tauri release build
+is queued behind the daemon's Cargo lock. Native startup must first isolate
+the hard-coded data directory and daemon address from existing installations.
 
 File System Intelligence is a flagship priority identified by James (Codex,
 September 18). The product boundary now names persistent file and folder

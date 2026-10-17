@@ -26,13 +26,20 @@ upstream product identity and update endpoints, and include required notices.
   did not change. Upstream pins Bun 1.3.4; use that version for reproduction.
 - Bun 1.3.4: obtained with `bun x bun@1.3.4`; its frozen install also passed
   without tracked lockfile changes.
+- Typecheck and production build also passed under Bun 1.3.4. The production
+  build took 22.15 seconds; output is in ignored `baseline-frontend-build.log`.
 - Rust 1.97.1 MSVC: installed as an additional toolchain without changing the
   default toolchain.
 - `bun run --filter @sd/tauri typecheck`: passed.
 - `bun run --filter @sd/tauri build`: passed. Existing Sass deprecation,
   annotation, mixed-import, and large-chunk warnings remain.
 - `cargo build --locked --release --bin sd-daemon`: started; outcome pending.
-- Tauri executable build, isolated data startup, and visual baseline: pending.
+- `cargo build --locked --release -p spacedrive`: started; waiting for the
+  daemon build's Cargo lock. Output is in ignored `baseline-tauri-build.log`.
+- Isolated data startup and visual baseline: pending. The unchanged Tauri app
+  resolves its data directory to `~/.spacedrive` and its daemon address to
+  `127.0.0.1:6969`. Establish isolation before launching; changing USERPROFILE
+  alone does not establish that the Windows known-folder API is isolated.
 
 No runtime code changed. A frontend build does not prove that the daemon or
 Windows application works. Do not use the user's Workspace Filer database or
