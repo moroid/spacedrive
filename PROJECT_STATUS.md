@@ -55,6 +55,11 @@ and remaining gates. Continue with the corrected daemon/desktop connection.
 The native test launcher now pre-seeds isolated service settings before startup
 and records process ownership and hashes. Parser and PrepareOnly checks pass;
 full execution awaits the daemon rebuild.
+The corrected daemon release build passed in 12m26s. The launcher connected and
+rendered native Home, then cleaned up both child processes. Logs confirm no peer
+endpoint or automatic speed tests. Library adapter initialization still used the
+default data directory; it now uses CoreContext.data_dir. Its first workspace-dev
+build is running. Live listing, isolation recheck and two panes remain pending.
 
 File System Intelligence is a flagship priority identified by James (Codex,
 September 18). The product boundary now names persistent file and folder

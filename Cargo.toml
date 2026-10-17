@@ -175,6 +175,18 @@ opt-level     = "s"      # Optimize for binary size
 panic         = "unwind" # Sadly we need unwind to avoid unexpected crashes on third party crates
 strip         = true     # Remove debug symbols
 
+# Keep native workspace iteration separate from the optimized release gate.
+[profile.workspace-dev]
+inherits = "dev"
+opt-level = 0
+lto = false
+
+[profile.workspace-dev.package."*"]
+opt-level = 0
+
+[profile.workspace-dev.build-override]
+opt-level = 0
+
 # Fast mobile development profile - trades binary size for build speed
 # Use with: cargo build --profile mobile-dev
 # For production mobile releases, use --release instead

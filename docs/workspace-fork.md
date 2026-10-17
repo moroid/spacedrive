@@ -171,3 +171,31 @@ Each prepared run also creates `test-files/A/alpha.txt` and
 `test-files/B/bravo.txt`, with both directory paths in the manifest. Use these
 for the first real listings and later pane independence checks instead of
 registering the user's home folder or a complete drive.
+
+## Connected native baseline, 2026-10-17
+
+The networking-config daemon rebuild passed in 12m26s. The complete launcher
+then reached its running state, verified Pong and port ownership, and opened the
+native Home screen. Closing that window ended the launcher successfully with
+both child processes gone. Run evidence is in the ignored directory
+`.workspace-test/1be447bf8fe74bca9620f001443a5f12`.
+
+- Daemon SHA256: `EE8F0466FDB1CBBEB83B802C4CBD3F794404A4A05EF193EE315C8C8E2DE9A1E2`.
+- Desktop SHA256: `5956C35B58CE3E7B9011799D6B705E7665E9B688A8CDAE4BC12807DF5EDD2524`.
+- Main-window WebView directory exists under the selected instance.
+- Logs confirm disabled volume monitoring, peer networking and statistics.
+  No automatic speed-test or peer endpoint startup was observed in that run.
+- Native Home rendered its sidebar, theme and empty storage state. No live
+  file listing or two-pane independence is claimed.
+
+This run also found that library SourceManager initialization resolved adapters
+and stores from the default directory instead of CoreContext.data_dir. That
+created default-directory adapter data despite the selected instance. The
+processes were stopped; those files were not deleted or treated as user data
+to migrate. SourceManager now resolves both locations from its active context,
+and the startup diagnostic reports the effective networking state. Rebuild and
+runtime verification of this correction are pending.
+
+The `workspace-dev` Cargo profile disables LTO and dependency optimization for
+native development iteration. It leaves release unchanged. Its first daemon
+build is in progress; passing this profile will not prove a release artifact.

@@ -143,11 +143,12 @@ impl Library {
 		// is rebuilt wherever it is needed and an adapter is installed once for
 		// every library on the machine. The registration is what belongs to the
 		// library, and that is a row in `sources`.
-		let dirs = crate::infra::source_dirs::SourceDirs::from_default_data_dir()
-			.map_err(|e| LibraryError::Other(format!("Failed to resolve source layout: {e}")))?;
-		let adapters_dir = crate::config::default_data_dir()
-			.map_err(|e| LibraryError::Other(format!("Failed to resolve data directory: {e}")))?
-			.join("adapters");
+		let dirs =
+			crate::infra::source_dirs::SourceDirs::under_data_dir(&self.core_context.data_dir)
+				.map_err(|e| {
+					LibraryError::Other(format!("Failed to resolve source layout: {e}"))
+				})?;
+		let adapters_dir = self.core_context.data_dir.join("adapters");
 
 		let source_manager =
 			crate::data::manager::SourceManager::new(dirs.root().to_path_buf(), adapters_dir)
