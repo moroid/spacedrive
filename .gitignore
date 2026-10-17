@@ -493,3 +493,4 @@ docs/local/
 
 # Claude Code session state
 .claude/scheduled_tasks.lock
+/target-isolation/

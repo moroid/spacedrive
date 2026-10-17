@@ -1538,6 +1538,12 @@ async fn start_daemon(
 	data_dir: &PathBuf,
 	socket_addr: &str,
 ) -> Result<std::process::Child, String> {
+	if sd_tauri_core::workspace_test::workspace_test_launch()
+		.map_err(|error| error.to_string())?
+		.is_some()
+	{
+		return Err("Workspace test daemon is externally managed".to_string());
+	}
 	let daemon_path = find_daemon_binary()?;
 
 	tracing::info!("Starting daemon from: {:?}", daemon_path);
@@ -1889,6 +1895,15 @@ fn setup_menu(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn main() {
+	let workspace_test = sd_tauri_core::workspace_test::workspace_test_launch()
+		.expect("Invalid workspace test launch settings");
+	let mut context = tauri::generate_context!();
+	if let Some(test) = &workspace_test {
+		context.config_mut().identifier = "com.workspacefiler.spacedrive-test".to_string();
+		for window in &mut context.config_mut().app.windows {
+			window.data_directory = Some(test.data_dir.join("webview").join(&window.label));
+		}
+	}
 	// Initialize logging
 	tracing_subscriber::registry()
 		.with(
@@ -1947,7 +1962,7 @@ fn main() {
 			keybinds::unregister_keybind,
 			keybinds::get_registered_keybinds
 		])
-		.setup(|app| {
+		.setup(move |app| {
 			// Setup native menu
 			if let Err(e) = setup_menu(app.handle()) {
 				tracing::warn!("Failed to setup menu: {}", e);
@@ -2039,11 +2054,16 @@ fn main() {
 				tracing::info!("Drag ended callback registered");
 			}
 
-			// Get data directory (use default Spacedrive location)
-			let data_dir =
-				sd_tauri_core::default_data_dir().expect("Failed to get default data directory");
-
-			let socket_addr = "127.0.0.1:6969".to_string();
+			let (data_dir, socket_addr) = match &workspace_test {
+				Some(test) => {
+					std::fs::create_dir_all(&test.data_dir)?;
+					(test.data_dir.clone(), test.daemon_addr.to_string())
+				}
+				None => (
+					sd_tauri_core::default_data_dir()?,
+					"127.0.0.1:6969".to_string(),
+				),
+			};
 
 			// Initialize state immediately (before async operations)
 			let daemon_state = Arc::new(RwLock::new(DaemonState {
@@ -2207,6 +2227,6 @@ fn main() {
 				}
 			}
 		})
-		.run(tauri::generate_context!())
+		.run(context)
 		.expect("error while running tauri application");
 }

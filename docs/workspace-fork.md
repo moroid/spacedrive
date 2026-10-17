@@ -69,3 +69,28 @@ Source: https://github.com/spacedriveapp/spaceui/blob/54e01a5940e41ad0c301328105
 
 This inventory covers the first UI dependencies, not all transitive libraries,
 images, fonts, or the final distribution. Complete that inventory before release.
+
+## Native test launch preparation
+
+The `workspace-isolation` worktree preserves the original baseline build input
+while preparing native testing. Set both `SD_WORKSPACE_TEST_DATA_DIR` (an absolute
+directory) and `SD_WORKSPACE_TEST_DAEMON_ADDR` (a numeric loopback endpoint on a
+dedicated, nonzero port). Missing one setting, relative paths, non-loopback
+addresses and the normal port 6969 are rejected before app startup.
+
+Start the named daemon separately with a dedicated base directory, `--instance`
+and `--no-default-sources`. Use its actual instance directory and listening
+address for the two settings. The Tauri test process does not start a default
+daemon when the external endpoint is unavailable. Its application identifier
+and configured main-window WebView directory also differ from the normal app.
+The ordinary launch retains upstream defaults when neither setting is present.
+
+`cargo test --locked -p sd-tauri-core --target-dir target-isolation` passed all
+four tests, covering paired settings, default behavior, rejected destinations,
+and a Unicode path. Rust formatting passes with `newline_style=Auto` to preserve
+the Windows checkout's existing newlines. The default newline-style check also
+flags unchanged upstream CRLF files.
+
+Tauri integration compilation, external-daemon startup, dynamic secondary-window
+profiles, actual data isolation and native screen capture remain unverified.
+These settings are development test infrastructure, not portable release support.

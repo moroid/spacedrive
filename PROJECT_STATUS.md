@@ -44,6 +44,11 @@ records provenance, evidence, and the next gate. No runtime behavior changed.
 The frontend checks also pass with pinned Bun 1.3.4. The Tauri release build
 is queued behind the daemon's Cargo lock. Native startup must first isolate
 the hard-coded data directory and daemon address from existing installations.
+On the separate `workspace-isolation` worktree, explicit test launch settings
+now select a dedicated data directory, loopback daemon endpoint and WebView
+profile. Four configuration tests pass. The Tauri integration has not compiled
+or run yet; keep it separate from the unchanged baseline build until that gate
+finishes. Native tests will use an externally managed named daemon.
 
 File System Intelligence is a flagship priority identified by James (Codex,
 September 18). The product boundary now names persistent file and folder

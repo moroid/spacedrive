@@ -3,6 +3,8 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod workspace_test;
+
 /// JSON-RPC 2.0 request structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JsonRpcRequest {
