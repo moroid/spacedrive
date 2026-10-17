@@ -166,3 +166,8 @@ The PowerShell parser and PrepareOnly path passed. The generated config uses
 AppConfig schema version 6 and contains no library identity or credentials.
 The complete launch/cleanup path has not run yet; the daemon rebuild remains
 the next gate. This helper requires PowerShell 7.4 or newer on Windows.
+
+Each prepared run also creates `test-files/A/alpha.txt` and
+`test-files/B/bravo.txt`, with both directory paths in the manifest. Use these
+for the first real listings and later pane independence checks instead of
+registering the user's home folder or a complete drive.

@@ -26,6 +26,11 @@ $port = 6970 + ($byteSum % 1000)
 $testRoot = Join-Path $repository ('.workspace-test/' + [Guid]::NewGuid().ToString('N'))
 $dataDirectory = Join-Path $testRoot ('instances/' + $instance)
 New-Item -ItemType Directory -Path $dataDirectory | Out-Null
+$fixtureA = Join-Path $testRoot 'test-files/A'
+$fixtureB = Join-Path $testRoot 'test-files/B'
+New-Item -ItemType Directory -Path $fixtureA, $fixtureB | Out-Null
+Set-Content -LiteralPath (Join-Path $fixtureA 'alpha.txt') -Value 'Workspace native test fixture A' -Encoding utf8
+Set-Content -LiteralPath (Join-Path $fixtureB 'bravo.txt') -Value 'Workspace native test fixture B' -Encoding utf8
 $config = [ordered]@{
     version = 6
     data_dir = $dataDirectory
@@ -47,6 +52,8 @@ $manifest = [ordered]@{
     webviewDirectory = Join-Path $dataDirectory 'webview'
     daemonPath = $DaemonPath
     desktopPath = $DesktopPath
+    fixtureA = $fixtureA
+    fixtureB = $fixtureB
     status = 'prepared'
 }
 $manifestPath = Join-Path $testRoot 'launch.json'
