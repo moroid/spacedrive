@@ -101,3 +101,16 @@ separating it from the normal installation. Test launches reject daemon service
 installation and removal before those commands reach the OS. The configuration
 tests still pass. A separate `cargo check --locked -p spacedrive --target-dir
 target-isolation` is running; `isolation-tauri-check.log` holds its output.
+
+The first Tauri integration check failed before compiling the application:
+`tauri.windows.conf.json` unconditionally required `../../.deps/bin/*.dll`,
+although upstream setup makes that codec bundle optional. The build script now
+omits only that glob when no DLLs exist, preserves other resources and explicit
+list overrides, and passes the effective configuration to code generation.
+No dummy DLL or codec feature was added. Windows codec-dependent previews still
+require their optional dependencies.
+
+After this correction, the complete isolated Tauri `cargo check` passed in
+12.75 seconds. Existing unused-import and missing-sidecar warnings remain.
+The separate native debug build has started. An actual executable launch and
+daemon connection are not proven by this check.

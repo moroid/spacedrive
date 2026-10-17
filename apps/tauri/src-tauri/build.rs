@@ -75,6 +75,35 @@ fn main() {
 		""
 	};
 
+	if target_triple.contains("windows") {
+		let native_bin = std::path::Path::new(&workspace_dir).join("apps/.deps/bin");
+		println!("cargo:rerun-if-changed={}", native_bin.display());
+		let has_dlls = std::fs::read_dir(&native_bin)
+			.map(|entries| {
+				entries.filter_map(Result::ok).any(|entry| {
+					entry
+						.path()
+						.extension()
+						.is_some_and(|ext| ext.eq_ignore_ascii_case("dll"))
+				})
+			})
+			.unwrap_or(false);
+		if !has_dlls {
+			let mut config: serde_json::Value = std::env::var("TAURI_CONFIG")
+				.ok()
+				.and_then(|raw| serde_json::from_str(&raw).ok())
+				.unwrap_or_else(|| serde_json::json!({}));
+			if !config["bundle"]["resources"].is_array() {
+				// The native codec bundle is opt-in; a missing bundle must not break ordinary Windows builds.
+				config["bundle"]["resources"]["../../.deps/bin/*.dll"] = serde_json::Value::Null;
+				std::env::set_var("TAURI_CONFIG", config.to_string());
+			}
+			println!(
+				"cargo:warning=Optional native codec DLLs are absent; omitting their resource glob"
+			);
+		}
+	}
+
 	for source_profile in [profile.as_str(), "release"] {
 		let daemon_source = format!(
 			"{}/target/{}/sd-daemon{}",
@@ -132,5 +161,8 @@ fn main() {
 		);
 	}
 
+	if let Ok(config) = std::env::var("TAURI_CONFIG") {
+		println!("cargo:rustc-env=TAURI_CONFIG={config}");
+	}
 	tauri_build::build()
 }

@@ -52,6 +52,9 @@ finishes. Native tests will use an externally managed named daemon.
 Dynamic windows now share the isolated main-window WebView profile, and service
 installation/removal is unavailable in test mode. Configuration tests pass;
 the Tauri integration check is running in its own target directory.
+The integration check passed after fixing the upstream optional-DLL resource
+glob, which otherwise fails ordinary Windows builds without apps/.deps. A
+native debug executable build is running. No native launch is claimed yet.
 
 File System Intelligence is a flagship priority identified by James (Codex,
 September 18). The product boundary now names persistent file and folder
