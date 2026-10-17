@@ -146,3 +146,23 @@ the existing `services.networking_enabled` setting instead of unconditionally
 restarting a disabled network service. That daemon rebuild is in progress;
 the corrected daemon/desktop connection and live listing remain unverified.
 Both desktop test windows were closed after these checks.
+
+## Repeatable native test launcher
+
+`scripts/start-workspace-native-test.ps1` prepares a fresh ignored
+`.workspace-test/<id>` directory. It writes the disabled discovery/volume-monitor
+settings before starting the daemon, uses a named instance, checks a Pong reply
+and listening-process ownership, and passes that instance to the desktop.
+It records binary hashes, process IDs, paths and logs in `launch.json`. Closing
+the test desktop lets the script stop only its own daemon; test data is retained.
+Use the rebuilt daemon that honors networking_enabled.
+
+```powershell
+pwsh -File scripts/start-workspace-native-test.ps1 -PrepareOnly
+pwsh -File scripts/start-workspace-native-test.ps1 -DesktopPath <built-desktop.exe>
+```
+
+The PowerShell parser and PrepareOnly path passed. The generated config uses
+AppConfig schema version 6 and contains no library identity or credentials.
+The complete launch/cleanup path has not run yet; the daemon rebuild remains
+the next gate. This helper requires PowerShell 7.4 or newer on Windows.

@@ -52,6 +52,9 @@ stopped. Dedicated test settings disable volume monitoring and networking;
 bootstrap now respects networking_enabled. That daemon rebuild is running.
 The test desktop windows are closed. docs/workspace-fork.md records evidence
 and remaining gates. Continue with the corrected daemon/desktop connection.
+The native test launcher now pre-seeds isolated service settings before startup
+and records process ownership and hashes. Parser and PrepareOnly checks pass;
+full execution awaits the daemon rebuild.
 
 File System Intelligence is a flagship priority identified by James (Codex,
 September 18). The product boundary now names persistent file and folder
