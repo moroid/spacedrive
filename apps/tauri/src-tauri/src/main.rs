@@ -1910,10 +1910,10 @@ fn main() {
 	let workspace_test = sd_tauri_core::workspace_test::workspace_test_launch()
 		.expect("Invalid workspace test launch settings");
 	let mut context = tauri::generate_context!();
-	if let Some(test) = &workspace_test {
+	if workspace_test.is_some() {
 		context.config_mut().identifier = "com.workspacefiler.spacedrive-test".to_string();
 		for window in &mut context.config_mut().app.windows {
-			window.data_directory = Some(test.webview_data_dir());
+			window.create = false;
 		}
 	}
 	// Initialize logging
@@ -1975,6 +1975,13 @@ fn main() {
 			keybinds::get_registered_keybinds
 		])
 		.setup(move |app| {
+			if let Some(test) = &workspace_test {
+				for config in &app.config().app.windows {
+					tauri::WebviewWindowBuilder::from_config(app, config)?
+						.data_directory(test.webview_data_dir())
+						.build()?;
+				}
+			}
 			// Setup native menu
 			if let Err(e) = setup_menu(app.handle()) {
 				tracing::warn!("Failed to setup menu: {}", e);

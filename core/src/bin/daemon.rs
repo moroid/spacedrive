@@ -49,9 +49,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 	let args = Args::parse();
 
 	// Resolve base data directory
-	let base_data_dir = args
-		.data_dir
-		.unwrap_or(sd_core::config::default_data_dir()?);
+	let base_data_dir = match args.data_dir {
+		Some(path) => path,
+		None => sd_core::config::default_data_dir()?,
+	};
 
 	// Validate instance name for security
 	if let Some(instance) = &args.instance {

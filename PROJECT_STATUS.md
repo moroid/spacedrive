@@ -36,25 +36,22 @@ Physical-drive identity remains separate from product recognition and visuals.
 
 ## Immediate register
 
-Workspace fork (2026-10-17): Windows MDI and task-workspace development has
-started on `workspace-mdi`, based on upstream `4d41a379`. Unchanged frontend
-typecheck and production build pass. The daemon release build is in progress;
-native startup and two-pane isolation remain pending. `docs/workspace-fork.md`
-records provenance, evidence, and the next gate. No runtime behavior changed.
-The frontend checks also pass with pinned Bun 1.3.4. The Tauri release build
-is queued behind the daemon's Cargo lock. Native startup must first isolate
-the hard-coded data directory and daemon address from existing installations.
-On the separate `workspace-isolation` worktree, explicit test launch settings
-now select a dedicated data directory, loopback daemon endpoint and WebView
-profile. Four configuration tests pass. The Tauri integration has not compiled
-or run yet; keep it separate from the unchanged baseline build until that gate
-finishes. Native tests will use an externally managed named daemon.
-Dynamic windows now share the isolated main-window WebView profile, and service
-installation/removal is unavailable in test mode. Configuration tests pass;
-the Tauri integration check is running in its own target directory.
-The integration check passed after fixing the upstream optional-DLL resource
-glob, which otherwise fails ordinary Windows builds without apps/.deps. A
-native debug executable build is running. No native launch is claimed yet.
+Workspace fork (2026-10-17): work on workspace-mdi starts from upstream
+4d41a379. Unchanged frontend checks pass, including pinned Bun 1.3.4. The
+unchanged daemon release build passed in 20m19s; the unchanged Tauri release
+build failed at the optional codec DLL resource glob. Its fix and the isolated
+launch configuration are integrated. Four configuration tests and complete
+Tauri check pass; the native debug executable builds and displays its startup
+screen. Explicit main-window construction now puts the WebView profile in the
+test directory; the ordinary data directory remains absent. No live listing
+or MDI implementation has been verified.
+
+The lazy default-path daemon fix built successfully. The named-instance smoke
+test revealed automatic drive speed tests and discovery, so its process was
+stopped. Dedicated test settings disable volume monitoring and networking;
+bootstrap now respects networking_enabled. That daemon rebuild is running.
+The test desktop windows are closed. docs/workspace-fork.md records evidence
+and remaining gates. Continue with the corrected daemon/desktop connection.
 
 File System Intelligence is a flagship priority identified by James (Codex,
 September 18). The product boundary now names persistent file and folder

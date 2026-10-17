@@ -33,9 +33,10 @@ upstream product identity and update endpoints, and include required notices.
 - `bun run --filter @sd/tauri typecheck`: passed.
 - `bun run --filter @sd/tauri build`: passed. Existing Sass deprecation,
   annotation, mixed-import, and large-chunk warnings remain.
-- `cargo build --locked --release --bin sd-daemon`: started; outcome pending.
-- `cargo build --locked --release -p spacedrive`: started; waiting for the
-  daemon build's Cargo lock. Output is in ignored `baseline-tauri-build.log`.
+- `cargo build --locked --release --bin sd-daemon`: passed in 20m 19s.
+  Baseline EXE SHA256: `BBEEB444AFF9E274E3D865D354B24D5525E0CAAAE7A0CF44407EBF5511987E44`.
+- `cargo build --locked --release -p spacedrive`: failed at the unconditional
+  optional-DLL resource glob. Output is in ignored `baseline-tauri-build.log`.
 - Isolated data startup and visual baseline: pending. The unchanged Tauri app
   resolves its data directory to `~/.spacedrive` and its daemon address to
   `127.0.0.1:6969`. Establish isolation before launching; changing USERPROFILE
@@ -114,3 +115,34 @@ After this correction, the complete isolated Tauri `cargo check` passed in
 12.75 seconds. Existing unused-import and missing-sidecar warnings remain.
 The separate native debug build has started. An actual executable launch and
 daemon connection are not proven by this check.
+
+The unchanged daemon binary is preserved under the source project's ignored
+`tests/.fixtures/spacedrive-baseline/`. The Windows build and test-launch changes
+were fast-forwarded into `workspace-mdi` only after both baseline build handles
+finished. The daemon's explicit `--data-dir` previously evaluated
+`default_data_dir()` eagerly through `unwrap_or`, creating `~/.spacedrive` even
+when that directory was not selected. A match now evaluates the default only
+when needed. This daemon rebuild passed in 13m29s.
+
+## Native startup observations
+
+The isolated desktop debug build passed. The first native launch displayed the
+startup screen with the external daemon absent. It did not create `~/.spacedrive`,
+but the configured WebView directory was not created: the main window used the
+test application identifier's AppData profile instead. Test launches now create
+configured windows explicitly and apply `WebviewWindowBuilder::data_directory`
+after reading their configuration. A rebuilt native launch created the expected
+`tests/.fixtures/spacedrive-native/instances/mdifork/webview` directory. Logs
+confirmed the selected instance directory and `127.0.0.1:7718`. The ordinary data
+directory remained absent. This proves startup/profile selection, not a working
+file listing; the UI remained on its startup screen without the daemon.
+
+The named-instance daemon smoke test exposed two additional startup behaviors:
+volume monitoring attempted automatic drive speed tests, and networking
+discovery started despite `--no-default-sources`. The test daemon was stopped.
+That switch only controls source registration, so the dedicated test config now
+disables volume monitoring, networking and statistics. Bootstrap also now honors
+the existing `services.networking_enabled` setting instead of unconditionally
+restarting a disabled network service. That daemon rebuild is in progress;
+the corrected daemon/desktop connection and live listing remain unverified.
+Both desktop test windows were closed after these checks.

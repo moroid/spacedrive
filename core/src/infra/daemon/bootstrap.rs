@@ -31,7 +31,7 @@ pub async fn start_default_server(
 	}
 
 	// Initialize networking if enabled
-	if enable_networking {
+	if enable_networking && core.config.read().await.services.networking_enabled {
 		core.init_networking()
 			.await
 			.map_err(|e| format!("Failed to initialize networking: {}", e))?;
